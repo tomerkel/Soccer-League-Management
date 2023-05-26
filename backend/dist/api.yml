@@ -1,0 +1,772 @@
+# openapi: 3.0.0
+# servers:
+#   # Added by API Auto Mocking Plugin
+#   - description: SwaggerHub API Auto Mocking
+#     url: https://virtserver.swaggerhub.com/tomerkel/HW3.1/1.0.0
+# info:
+#   description: This is a simple API
+#   version: "1.0.0"
+#   title: Simple Inventory API
+#   contact:
+#     email: tomerkel@post.bgu.ac.il
+#   license:
+#     name: Apache 2.0
+#     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+openapi: 3.0.0
+info:
+  title: api
+  description: API for project
+  version: 1.0.0
+tags:
+  - name: auth
+  - name: Players
+  - name: users
+  - name: Team
+  - name: League
+  - name: Game
+  - name: Asso-rep
+paths:
+  /Register:
+    post:
+      tags:
+        - auth
+      summary: Add new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/registerUser'
+        description: Register page
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Missing one or more parameters
+        '409':
+          description: Username taken
+  /Login:
+    post:
+      tags:
+        - auth
+      summary: login to the system with existing user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref : '#/components/schemas/LoginScheme'
+        description: Login page
+      responses:
+        '200':
+          description: Login succeeded
+        '401':
+          description: Username or Password incorrect
+        '400':
+          description: Missing one or more parameters
+  /Logout:
+    post:
+      tags:
+        - auth
+      summary: logout from the system
+      responses:
+        '200':
+          description: Logout succeeded
+
+  /players/playerPreview/{PlayerID}:
+    get:
+      tags:
+        - Players
+      summary: get preview data of the specific player
+      parameters:
+        - in: path
+          name: PlayerID
+          description: the id of the player
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The player preview details 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerPreview'
+        '404':
+          description: Player doesn't belong to SUPERLEAGUE
+          
+  /users/favorites/addGame:
+    post:
+      tags:
+        - users
+      summary: add game to user favorites games list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gameID:
+                  type: integer
+                  description: game id which the user saved in favorites
+                  example: 5
+      responses:
+        '201':
+          description: The game successfully saved as favorite
+        '400':
+          description: Missing one or more parameters
+        '401':
+          description: There is no logged in user
+        '404':
+          description: Game isn't exist
+        '409':
+          description: Game already marked as favorite
+  /users/isAssoRep:
+    get:
+      tags:
+        - users
+      summary: get boolean answer if the user is Association Representative
+      responses:
+        '200':
+          description: boolean answer
+  /users/favorites/getGames:
+    get:
+      tags:
+        - users
+      summary: get the list of favorites games
+      responses:
+        '200':
+          description: Results of games favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteGames'
+        '401':
+          description: There is no logged in user
+  /teams/search/{TeamName}:
+    get:
+      tags:
+        - Team
+      summary: search team by name or part of the name
+      parameters:
+        - in: path
+          name: TeamName
+          description: the name of the team
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Results of matching teams
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamPreviewList'
+        '404':
+          description: Team not found
+  /teams/teamFullDetails/{teamID}:
+    get:
+      tags:
+        - Team
+      summary: get team data of the specific team
+      parameters:
+        - in: path
+          name: teamID
+          description: the id of the team
+          required: true
+          schema:
+            type: string
+      responses:
+        '404':
+          description: Team doesn't belong to SUPERLEAGUE
+        '200':
+          description: Requested team full details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+  /players/search/{playerName}:
+    get:
+      tags:
+        - Players
+      summary: get preview data of players with this name
+      parameters:
+        - in: path
+          name: playerName
+          description: the name of the player
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Requested players with the given name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerPreviewList'
+        '404':
+          description: Player not found
+  /players/playerDetails/{playerID}:
+    get:
+      tags:
+        - Players
+      summary: get data of the specific player
+      parameters:
+        - in: path
+          name: playerID
+          description: the ID of the player
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Requested player with the given ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+        '404':
+          description: Player doesn't belong to SUPERLEAGUE  
+  /League/getDetails:
+    get:
+      tags:
+        - League
+      summary: get the data of the league
+      responses:
+        '200':
+          description: Requested data of SUPERLEAGUE
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaguePreview'
+  /games/gameDetails/{gameID}:
+    get:
+      tags:
+        - Game
+      summary: get the data of specific game
+      parameters:
+        - in: path
+          name: gameID
+          description: the ID of the game
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Requested data of the given game
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pastGame'
+        '404':
+          description: Game isn't exist
+  /games/allGames:
+    get:
+      tags:
+        - Game
+      summary: get list of all games
+      responses:
+        '200':
+          description: The data about all the games in system sorted by dates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  futureGames:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GamePreview'
+                  gamesHistory:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/pastGame'
+        '404':
+          description: Games not found
+  /associationRepresentatives/addReferee:
+    post:
+      tags:
+        - Asso-rep
+      summary: Add new referee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Referee'
+        description: add referee from existing user
+      responses:
+        '201':
+          description: referee created successfully
+        '400':
+          description: Missing one or more parameters
+        '409':
+          description: Referee exist or User isn't exist
+  /associationRepresentatives/addGame:
+    post:
+      tags:
+        - Asso-rep
+      summary: Add new game
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/addGame'
+        description: create new game with valid teams
+      responses:
+        '201':
+          description: game created successfully
+        '400':
+          description: Invalid or Missing parameters
+        '404':
+          description: Team or Referee not found
+        '409':
+          description: Team can't play 2 games in same day or 
+  /associationRepresentatives/allRepresentatives:
+    get:
+      tags:
+        - Asso-rep
+      summary: get list of all Asso-rep
+      responses:
+        '200':
+          description: Results of all Representatives
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssoRep'
+              example:
+        '404':
+          description: Representatives not found
+  /associationRepresentatives/addScoreToGame:
+    post:
+      tags:
+        - Asso-rep
+      summary: Add score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/addScore"
+        description: add score to existing game   
+      responses:
+        '201':
+          description: score added successfully
+        '400':
+          description: Missing one or more parameters
+        '404':
+          description: Game not found
+        '409':
+          description: Can't add result to a future game
+  /associationRepresentatives/addEventToGame:
+    post:
+      tags:
+        - Asso-rep
+      summary: Add event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/addEvent"
+
+        description: add event to existing game   
+      responses:
+        '201':
+          description: event added successfully
+        '400':
+          description: Missing one or more parameters
+        '404':
+          description: Game not found
+        '409':
+          description: Can't add event to a future game
+  
+components:
+  schemas:
+    AssoRep:
+      type: object
+      properties:
+        representativeID:
+          type: integer
+          example: 1
+          description: ID of the Association Representative
+    registerUser:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 8
+          example: TheKing
+          description: username contains 3-8 only letters
+        firstName:
+          type: string
+          example: David
+          description: user's first name
+        lastName:
+          type: string
+          example: Ben-Yishi
+          description: user's last name
+        country:
+          type: string
+          example: Israel
+          description: one of the countries from the given countries list
+        password:
+          type: string
+          minLength: 5
+          maxLength: 10
+          format: password
+          example: david@888
+          description: password contains 5-10 characters. Must have at least 1 number and 1 speical char
+        email:
+          type: string
+          format: email
+          example: davidtheking@gmail.com
+          description: user's email
+        imageUrl:
+          type: string
+          format: URL
+          example: https://images.app.goo.gl/xc7sUyZccYuAhCXT9
+          description: URL for the user's image
+    LoginScheme:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 8
+          description: username conatins letters only
+          example: TheKing
+        password:
+          type: string
+          minLength: 5
+          maxLength: 10
+          format: password
+          description: password conatins at least one number and one special char
+          example: david@888
+    Player:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Sten Michael Grytebust
+          description: player's full name
+        imageUrl:
+          type: string
+          format: URL
+          example: 'https://cdn.sportmonks.com/images/soccer/players/11/84587.png'
+          description: player's image
+        positionNumber:
+          type: integer
+          example: 1
+          description: player's position in team
+        teamName:
+          type: string
+          example: København
+          description: player's team name
+        commonName:
+          type: string
+          example: S. Grytebust
+          description: player's common name
+        nationality:
+          type: string
+          example: Norway
+          description: player's nationality
+        birthDate:
+          type: string
+          format: date
+          example: 25/10/1989
+          description: player's birth date
+        birthCountry:
+          type: string
+          example: Norway
+          description: player's birth country
+        height:
+          type: string
+          example: 185 cm
+          description: player's height
+        weight:
+          type: string
+          example: 86 kg
+          description: player's weight
+    PlayerPreview:
+      type: object
+      properties:
+        playerID:
+          type: integer
+          example: 82808
+          description: player's id
+        name:
+          type: string
+          example: Jesper Hansen
+          description: player's full name
+        image:
+          type: string
+          format: URL
+          example: 'https://cdn.sportmonks.com/images/soccer/players/24/82808.png'
+          description: player's image
+        position:
+          type: integer
+          example: 1
+          description: player's position
+        teamName:
+          type: string
+          example: Midtjylland
+          description: player's team name
+        teamShortName:
+          type: string
+          example: FCM
+          description: team's short code
+    PlayerPreviewList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PlayerPreview'
+    Referee:
+      type: object
+      properties:
+        userID:
+          type: integer
+          example: 5
+          description: ID of existing user
+        qualification:
+          type: string
+          example: "Master"
+          description: referee's qualification 
+    Team:
+      type: object
+      properties:
+        teamID:
+          type: integer
+          example: 939
+          description: the ID of the team
+        teamName:
+          type: string
+          example: Midtjylland
+          description: the name of the team
+        logo:
+          type: string
+          format: URL
+          example: 'https://cdn.sportmonks.com/images//soccer/teams/11/939.png'
+          description: the logo of the team
+        teamPlayers:
+          $ref: '#/components/schemas/PlayerPreviewList'
+        futureGames:
+          type: array
+          items:
+            $ref: '#/components/schemas/GamePreview'
+          description: list of game previews
+        gamesHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/pastGame'
+          description: list of past games
+    TeamPreview:
+      type: object
+      properties:
+        teamID:
+          type: integer
+          example: 939
+          description: the id of the team
+        teamName:
+          type: string
+          example: København
+          description: the name of the team
+        logo:
+          type: string
+          format: URL
+          example: 'https://cdn.sportmonks.com/images//soccer/teams/21/85.png'
+          description: the logo of the team
+    TeamPreviewList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TeamPreview'
+      description: list of team previews
+    GamePreview:
+      properties:
+        gameID:
+          type: integer
+          example: 4
+          description: the id of the game
+        gameDateTime:
+          type: string
+          description: date and hour of the game in string format
+          example: '2021-08-20T18:30:00.000Z'
+        homeTeamID:
+          type: integer
+          description: id of home team
+          example: 85
+        awayTeamID:
+          type: integer
+          description: id of away team
+          example: 939
+        stadium:
+          type: string
+          example: BGU
+          description: stadium name
+    pastGame:
+      type: object
+      properties:
+        gameDetails:
+          $ref: '#/components/schemas/Game'
+        gameEventsSchedule:
+          $ref: '#/components/schemas/EventSchedule'
+    Game:
+      type: object
+      properties:
+        gameID:
+          type: integer
+          example: 2
+          description: the id of the game
+        gameDateTime:
+          type: string
+          description: date and hour of the game in string format
+          example: "2021-05-15T19:00:00.000Z"
+        homeTeamID:
+          type: integer
+          example: 293
+          description: id of home team
+        awayTeamID:
+          type: integer
+          example: 390
+          description: id of away team
+        stadium:
+          type: string
+          example: BGU
+          description: stadium name
+        homeGoals:
+          type: integer
+          example: 1
+          description: goals of home team
+        awayGoals:
+          type: integer
+          example: 1
+          description: goals of away team
+        refereeName:
+          type: string
+          example: default user4
+          description: the name of the referee in the game
+    addGame:
+      type: object
+      properties:
+        gameDateTime:
+          type: string
+          format: datetime
+          example: "06/21/2021 19:30"
+          description: date and hour of the game          
+        homeTeam:
+          type: integer
+          example: 939
+          description: ID of home team
+        awayTeam:
+          type: integer
+          example: 85
+          description: ID of away team
+        studium:
+          type: string
+          example: BGU
+          description: stadium name
+        referee:
+          type: integer
+          example: 2
+          description: ID of game referee
+    addScore:
+      type: object
+      properties:
+        gameID:
+          type: integer
+          example: 4
+          description: ID of the game
+        homeGoals:
+          type: integer
+          example: 0
+          description: goals of home team 
+        awayGoals:
+          type: integer
+          example: 1
+          description: goals of away team
+    addEvent:
+      type: object
+      properties:
+        gameID:
+          type: integer
+          example: 4
+          description: ID of the game
+        gameMinute:
+          type: integer
+          minimum: 0
+          maximum: 120
+          example: 20
+          description: the minute that the event occurred
+        eventType:
+          type: string
+          example: Yellow card
+          description: one of - Goal, Offside, Foul, Red card, Yellow card, Injury, Substitution
+        description:
+          type: string
+          example: player 5 get a yellow card
+          description: event details
+    FavoriteGames:
+      type: array
+      items:
+        $ref: '#/components/schemas/GamePreview'
+      description: list of game previews
+    Event:
+      type: object
+      properties:
+        eventID:
+          type: integer
+          example: 2
+          description: the id of the event
+        gameDate:
+          type: string
+          example: '06/01/2021'
+          description: date of the game          
+        gameHour:
+          type: string
+          example: '19:00'
+          description: hour of the game         
+        ganeMinute:
+          type: integer
+          minimum: 0
+          maximum: 120
+          example: 30
+          description: the minute that the event occurred
+        eventType:
+          type: string
+          example: Yellow card
+          description: "one of: Goal, Offside, Foul, Red card, Yellow card, Injury, Substitution" 
+        description:
+          type: string
+          example: player 5 get a yellow card
+          description: event details
+    EventSchedule:
+      type: array
+      items:
+        $ref: '#/components/schemas/Event'
+      description: list of events
+    LeaguePreview:
+      type: object
+      properties:
+        leagueName:
+          type: string
+          example: Superliga
+          description: the name of the league
+        currentSeasonName:
+          type: string
+          example: 2021/2022
+          description: the name of the season
+        currentStageName:
+          type: string
+          example: Europe League playoffs - Final
+          description: the name of the stage
+        nextGame:
+          $ref: '#/components/schemas/GamePreview'
+        userFavoirtesFutureGames:
+          type: array
+          items:
+            $ref: '#/components/schemas/GamePreview'
+          description: games that logged in user marked as favorites
